@@ -1,0 +1,23 @@
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+  orders:
+    image: eclipse-temurin:21.0.5_11-jdk
+    working_dir: /work
+    volumes:
+      - ./:/work:ro
+    command: java -javaagent:/work/agent/opentelemetry-javaagent.jar App.java
+    environment:
+      OTEL_SERVICE_NAME: orders
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+    ports:
+      - "8080:8080"
+    depends_on:
+      - jaeger

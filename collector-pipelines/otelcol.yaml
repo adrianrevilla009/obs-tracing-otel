@@ -1,0 +1,30 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  batch: {}
+  attributes/env:
+    actions:
+      - key: deployment.environment
+        value: lab
+        action: upsert
+      - key: http.request.header.authorization
+        action: delete
+  filter/health:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["http.route"] == "/health"'
+exporters:
+  debug:
+    verbosity: basic
+  otlphttp/jaeger:
+    endpoint: http://jaeger:4318
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [filter/health, attributes/env, batch]
+      exporters: [debug, otlphttp/jaeger]

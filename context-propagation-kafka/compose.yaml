@@ -1,0 +1,7 @@
+# Optional broker for trying the real thing with OTel-agent-instrumented Kafka clients.
+# With the Java agent on producer and consumer, traceparent is injected/extracted on record headers automatically.
+services:
+  kafka:
+    image: apache/kafka:3.8.0
+    ports:
+      - "9092:9092"

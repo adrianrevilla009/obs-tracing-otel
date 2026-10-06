@@ -1,0 +1,15 @@
+services:
+  pyroscope:
+    image: grafana/pyroscope:1.9.2
+    ports:
+      - "4040:4040"
+  app:
+    image: python:3.12.7-slim
+    working_dir: /work
+    volumes:
+      - ./:/work:ro
+    command: sh -c "pip install --no-cache-dir pyroscope-io==0.8.8 && python busy.py"
+    environment:
+      PYROSCOPE_SERVER: http://pyroscope:4040
+    depends_on:
+      - pyroscope
